@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +16,11 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import recyclerviewloader.test.com.recyclerviewloader.communication.NetworkManager;
 import recyclerviewloader.test.com.recyclerviewloader.communication.NetworkOptions;
-import recyclerviewloader.test.com.recyclerviewloader.model.News;
+import recyclerviewloader.test.com.recyclerviewloader.models.MainModels;
 import recyclerviewloader.test.com.recyclerviewloader.retrofit.ApiClient;
 import recyclerviewloader.test.com.recyclerviewloader.retrofit.ApiInterface;
 import retrofit2.Call;
@@ -49,7 +50,7 @@ public class NewsListActivity extends AppCompatActivity implements NetworkManage
     private void setUI() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
         mCoordinatorLayoutView = findViewById(R.id.snackbarPosition);
-        mNewsListRecyclerView  = (RecyclerView) findViewById(R.id.device_recycler_view);
+        mNewsListRecyclerView = (RecyclerView) findViewById(R.id.device_recycler_view);
         mNewsListRecyclerView.setLayoutManager(new LinearLayoutManager(NewsListActivity.this));
         mNewsListRecyclerView.setHasFixedSize(true);
         mSwipeRefreshLayout.setVisibility(View.VISIBLE);
@@ -71,20 +72,18 @@ public class NewsListActivity extends AppCompatActivity implements NetworkManage
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
 
-        Call<News> call = apiService.getNewsList();
-        call.enqueue(new Callback<News>() {
+        Call<List<MainModels>> call = apiService.getNewsList();
+        call.enqueue(new Callback<List<MainModels>>() {
+
             @Override
-            public void onResponse(Call<News> call, Response<News> response) {
-                int statusCode = response.code();
-                Log.d("TAG","SIZE IS " + response.toString().length());
-                //List<Movie> movies = response.body().getResults();
-               // recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.list_item_movie, getApplicationContext()));
+            public void onResponse(Call<List<MainModels>> call, Response<List<MainModels>> response) {
+                Toast.makeText(NewsListActivity.this, "" + response.body().size(), Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
-            public void onFailure(Call<News> call, Throwable t) {
-                // Log error here since request failed
-                Log.e("TAG", t.toString());
+            public void onFailure(Call<List<MainModels>> call, Throwable t) {
+
             }
         });
     }
@@ -115,7 +114,7 @@ public class NewsListActivity extends AppCompatActivity implements NetworkManage
 
         @Override
         public void onRefresh() {
-            Toast.makeText(getApplicationContext(),"Loading",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Loading", Toast.LENGTH_SHORT).show();
             try {
                 new Handler().postDelayed(new Runnable() {
 
